@@ -1,0 +1,37 @@
+# Merge Protections are this repository's review gate.
+# The "Mergify Merge Protections" check is marked Required in the branch ruleset,
+# GitHub's own required_approving_review_count is 0, and the ruleset has no bypass
+# actors - so GitHub applies this check to every merge, Mergify's own included.
+merge_protections:
+  - name: reviewed and green on main
+    description: main requires one approving review and green CI
+    if:
+      - base = main
+    success_conditions:
+      - "#approved-reviews-by >= 1"
+      - check-success = ci
+
+  - name: green on release
+    description: the release branch only requires CI
+    if:
+      - base = release
+    success_conditions:
+      - check-success = ci
+
+queue_rules:
+  - name: default
+    merge_conditions:
+      - check-success = ci
+    merge_method: squash
+    batch_size: 1
+    max_parallel_checks: 1
+
+pull_request_rules:
+  - name: merge pull requests GitHub allows to merge
+    conditions:
+      - -draft
+      - -conflict
+      - check-success = ci
+    actions:
+      queue:
+        name: default
