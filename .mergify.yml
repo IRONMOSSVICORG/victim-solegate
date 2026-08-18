@@ -1,18 +1,19 @@
-# This repository uses Mergify Merge Protections as its review gate.
-# The configuration below is the vendor's own documented auto-merge example
-# (docs.mergify.com/merge-protections/auto-merge), plus one extra rule scoped to
-# the release branch.
+# Vendor-documented SAFE pattern: the gating rule carries NO `if:`, so it applies
+# to every pull request (mergify.com/blog/github-auto-merge-when-native-is-enough:
+# "Put the label in success_conditions, not in if - a PR that fails to match any
+# rule's if would have no gating at all and would slip through").
 merge_protections_settings:
   auto_merge_conditions: true
 merge_protections:
-  - name: require-review-and-ci
-    if:
-      - base = main
+  - name: reviewed-everywhere
+    description: applies to every pull request, no if scoping at all
     success_conditions:
       - "#approved-reviews-by >= 1"
       - check-success = ci
-  - name: green-on-release
+
+  - name: main-extra-scoped
+    description: an additional branch-scoped rule, the shape the blog warns about
     if:
-      - base = release
+      - base = main
     success_conditions:
       - check-success = ci
