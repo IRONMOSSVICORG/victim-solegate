@@ -1,18 +1,20 @@
-# This repository uses Mergify Merge Protections as its review gate.
-# The configuration below is the vendor's own documented auto-merge example
-# (docs.mergify.com/merge-protections/auto-merge), plus one extra rule scoped to
-# the release branch.
+# Two protections side by side:
+#  - reviewed-everywhere : if: true, the documented always-applies form
+#  - reviewed-on-main    : if: base = main, the vendor's canonical branch scoping
 merge_protections_settings:
   auto_merge_conditions: true
 merge_protections:
-  - name: require-review-and-ci
+  - name: reviewed-everywhere
+    description: applies to every pull request
+    if: true
+    success_conditions:
+      - "#approved-reviews-by >= 1"
+      - check-success = ci
+
+  - name: reviewed-on-main
+    description: branch-scoped, the canonical documented pattern
     if:
       - base = main
     success_conditions:
       - "#approved-reviews-by >= 1"
-      - check-success = ci
-  - name: green-on-release
-    if:
-      - base = release
-    success_conditions:
       - check-success = ci
